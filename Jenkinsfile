@@ -81,13 +81,21 @@ pipeline {
                }
           }
        }
-		 stage("Trigger CD Pipeline") {
-            steps {
-                script {
-                    sh "curl -v -k --user madival:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-65-0-122-52.ap-south-1.compute.amazonaws.com:8080/job/gitops-regester-app-cd/buildWithParameters?token=gitops-token'"
-                }
+		stage("Trigger CD Pipeline") {
+    steps {
+        script {
+            withEnv(["TOKEN=${JENKINS_API_TOKEN}"]) {
+                sh '''
+                    curl -v -k --user madival:${TOKEN} -X POST -H 'cache-control: no-cache' \
+                    -H 'content-type: application/x-www-form-urlencoded' \
+                    --data 'IMAGE_TAG=${IMAGE_TAG}' \
+                    'http://ec2-65-0-122-52.ap-south-1.compute.amazonaws.com:8080/job/gitops-regester-app-cd/buildWithParameters?token=gitops-token'
+                '''
             }
-       }	
+        }
+    }
+}
+
 	    
 		 
    }
